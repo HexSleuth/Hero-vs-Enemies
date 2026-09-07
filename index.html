@@ -1,0 +1,1706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Hero vs Enemies – Font Awesome Edition</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --bg: #0a0a1a;
+            --panel: #1a1a3a;
+            --accent: #ffd700;
+            --text: #fff;
+            --btn: #2a2a5a;
+            --btn-hover: #3a3a7a;
+            --danger: #ff5252;
+            --success: #4caf50;
+            --border: #3a3a6a;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+        }
+        body {
+            background: var(--bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif;
+            overflow: hidden;
+            margin: 0;
+            padding: 6px;
+            touch-action: manipulation;
+        }
+        .game-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            width: 100%;
+            max-width: 460px;
+            margin: 0 auto;
+        }
+        .hdr {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 460px;
+            padding: 2px 4px;
+        }
+        .title-text {
+            color: var(--accent);
+            font-size: 15px;
+            font-weight: 800;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .title-text i {
+            font-size: 16px;
+            color: #fff;
+            text-shadow: none;
+            filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.6));
+        }
+        .score-text {
+            color: #fff;
+            font-size: 13px;
+            font-weight: 700;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 3px 10px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .score-text i {
+            font-size: 12px;
+        }
+        .score-text .fa-heart {
+            color: #ff5252;
+        }
+        .score-text .fa-coins {
+            color: #ffd700;
+        }
+        canvas {
+            width: 100%;
+            max-width: 460px;
+            aspect-ratio: 460 / 700;
+            border-radius: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.15);
+            cursor: pointer;
+            display: block;
+            background: #0a0a1a;
+            touch-action: manipulation;
+        }
+        .ctrl-row {
+            display: flex;
+            gap: 8px;
+            width: 100%;
+            max-width: 460px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.25);
+            background: var(--btn);
+            color: var(--text);
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            letter-spacing: 0.3px;
+            touch-action: manipulation;
+            min-height: 38px;
+            min-width: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .btn i {
+            font-size: 13px;
+            transition: transform 0.2s;
+        }
+        .btn:active {
+            transform: scale(0.93);
+            background: var(--btn-hover);
+        }
+        .btn:active i {
+            transform: scale(1.2);
+        }
+        .btn.muted {
+            border-color: var(--danger);
+            background: rgba(120, 20, 20, 0.7);
+        }
+        .btn.muted i {
+            color: #ff6b6b;
+        }
+        .btn .ic {
+            font-size: 13px;
+        }
+        @media (max-width: 480px) {
+            .btn {
+                padding: 6px 12px;
+                font-size: 10px;
+                min-height: 34px;
+                min-width: 58px;
+                border-radius: 17px;
+                gap: 4px;
+            }
+            .btn i {
+                font-size: 11px;
+            }
+            .title-text {
+                font-size: 12px;
+                gap: 4px;
+            }
+            .title-text i {
+                font-size: 13px;
+            }
+            .score-text {
+                font-size: 10px;
+                padding: 2px 7px;
+                gap: 4px;
+            }
+            .score-text i {
+                font-size: 10px;
+            }
+        }
+        @media (max-width: 350px) {
+            .btn {
+                padding: 5px 8px;
+                font-size: 9px;
+                min-height: 28px;
+                min-width: 48px;
+                gap: 3px;
+            }
+            .btn i {
+                font-size: 10px;
+            }
+            .ctrl-row {
+                gap: 4px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-wrap">
+        <div class="hdr">
+            <span class="title-text"><i class="fa-solid fa-gamepad"></i> HERO VS ENEMIES</span>
+            <span class="score-text" id="scoreBar"><i class="fa-solid fa-star"></i> SCORE: 0 | <i class="fa-solid fa-heart"></i> 3</span>
+        </div>
+        <canvas id="gameCanvas" width="460" height="700"></canvas>
+        <div class="ctrl-row">
+            <button id="btnRestart" class="btn" title="Restart (R)"><i class="fa-solid fa-rotate-right"></i> Restart</button>
+            <button id="btnMute" class="btn" title="Sound (M)"><i class="fa-solid fa-volume-high"></i> Sound</button>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // ============================================================
+            // HERO VS ENEMIES – Font Awesome Edition
+            // ============================================================
+
+            if (!CanvasRenderingContext2D.prototype.roundRect) {
+                CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
+                    if (typeof r === 'number') r = { tl: r, tr: r, br: r, bl: r };
+                    else r = { tl: r || 0, tr: r || 0, br: r || 0, bl: r || 0 };
+                    this.moveTo(x + r.tl, y);
+                    this.lineTo(x + w - r.tr, y);
+                    this.quadraticCurveTo(x + w, y, x + w, y + r.tr);
+                    this.lineTo(x + w, y + h - r.br);
+                    this.quadraticCurveTo(x + w, y + h, x + w - r.br, y + h);
+                    this.lineTo(x + r.bl, y + h);
+                    this.quadraticCurveTo(x, y + h, x, y + h - r.bl);
+                    this.lineTo(x, y + r.tl);
+                    this.quadraticCurveTo(x, y, x + r.tl, y);
+                    this.closePath();
+                    return this;
+                };
+            }
+
+            const canvas = document.getElementById('gameCanvas');
+            const ctx = canvas.getContext('2d');
+            const W = 460;
+            const H = 700;
+            canvas.width = W;
+            canvas.height = H;
+
+            const scoreBar = document.getElementById('scoreBar');
+            const btnRestart = document.getElementById('btnRestart');
+            const btnMute = document.getElementById('btnMute');
+            const muteIcon = btnMute.querySelector('i');
+
+            // ============ FONT AWESOME CANVAS HELPERS ============
+            function faFont(size, weight) {
+                return `${weight || 900} ${size}px "Font Awesome 6 Free"`;
+            }
+
+            function drawFA(unicode, x, y, size, color, align, baseline) {
+                ctx.save();
+                ctx.fillStyle = color || '#fff';
+                ctx.font = faFont(size);
+                ctx.textAlign = align || 'center';
+                ctx.textBaseline = baseline || 'middle';
+                ctx.fillText(unicode, x, y);
+                ctx.restore();
+            }
+
+            // ============ CHARACTER IMAGE URLS (5 total) ============
+            const CHARACTER_IMAGES = [
+                'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiBGtkSeMPDxviFWdEIuXef4IUvDtL7CXiWjfs2YLX-ZDS-b-Iyj9ID-0tAPL6ZVIedGO6-B3q81T_WPeLUxhawLdPTjJRGGvuhmC_g0kugonhB4-g_QCU49sEBX98LkcwRmR7IjJCRZ8L6lfkxmfVPBucCJZn3YtuElM4oLda0UbWXxRUmqa73-0ykwN7o/s1600/1000220513.png',
+                'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgowXN_phfG4QGYYrM_zN2BpIRAFf46yUp3SKv3_wAaIW9y2KMSsl3V1BywxCyTIOi8o1oCWQxdL3AiXV7k9UKMi4G8SFVn2GvlWaTsyoeCDtfpkFmQ17BEf7uMTAQI2HPu0mzBnsTiPNoK-vQfnDgEcEtMEBkHLBUZSUTRce9dxs80dvbo5oqYkd5fWdCu/s1600/1000220512.png',
+                'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhRpfEh0sh8sBbAzpTS7fMIMVr7hRv8RVvpYR8FQdBauY-ZmwQtE1AsKGFkDLHBHcZDVhtaeFRwxNfCMnmS-QRFLpHIUpp2NQWx0jM3i-9UBjAL_0Q-pszBxp_CE-0uAsUFXnpeQEEOMekOjLd72GFMbvzgv8kK2gtBZbqf23J4rFrV7duUZG7ZfYdoCpTA/s1600/1000220511.png',
+                'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEigqVaEJOE9p95B4rQYvzh6csGV0qXVPuVJkDinYVczr3x8ZhOyZ03zD4Ccl3pRx0u1TTvz8abjsoRYp21t06Ru5J3d2w6fyP5ya1UCNLDLPgmSCepBj6YzvjbGxSH7KkEjrP5LkFgfuz6xtoeybWGbLsPcbVJHttH-s174DIxIsRrMOjxDdEG7iza3gzc_/s1600/1000220510.png',
+                'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgOIWc_wbHMxxi_ZDbl4334AOzjiJZcyt5xWcTgV6cbLMUbASm1QkZPEcndg90hIvjdv_UUa7kO3plRgR10KK6gBFaS3jQfyyUMfXFl9mP8tafgMPUshfU28yFKKm0Q5jEbffWnME6sMqRWY_Qk5IV845IwToe8-XEb587ZCOu4vbRELDc2RkAO73T7HbWX/s1600/1000220509.png'
+            ];
+
+            const BACKGROUND_UI_URL = 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhaLbYR4eVavV5GuH_V5joluOsOcio_TxBoYY20t5vB5icmz_BoNtbqPNdVC867NvJnEcgMKw2hTkBlpmyZXIfz8sFLZLzlly1b20Fb2ogyodQmaQljSyLDQdBrzvGXNki205C_9wY6V7aYusm8eQIUKe2PcG7bHOFYc2l39WLhXdhJVZu-ePnFC0IskXsA/s1600/1000220506.png';
+
+            // ============ BACKGROUND MUSIC URL (Google Drive direct) ============
+            const BGM_URL = 'https://drive.google.com/uc?export=download&id=1KtWAsIdIYeL6G7m9O1vKQmI718mFPHGe';
+
+            // ============ GAME CONSTANTS ============
+            const GRAVITY = 0.6;
+            const JUMP_FORCE = -12.5;
+            const MOVE_SPEED = 3.8;
+            const PLAYER_W = 42;
+            const PLAYER_H = 48;
+            const GROUND_Y = H - 70;
+            const WORLD_WIDTH = 2800;
+            const ENEMY_W = 38;
+            const ENEMY_H = 44;
+            const MAX_LEVEL = 12;
+
+            // ============ GAME STATE ============
+            let gameState = 'select';
+            let score = 0;
+            let coins = 0;
+            let lives = 3;
+            let level = 1;
+            let playerX = 80;
+            let playerY = GROUND_Y - PLAYER_H;
+            let playerVX = 0;
+            let playerVY = 0;
+            let isGrounded = false;
+            let facing = 1;
+            let invincible = false;
+            let invincibleTimer = 0;
+            let bigMode = false;
+            let bigTimer = 0;
+            let starMode = false;
+            let starTimer = 0;
+            let doubleJump = false;
+            let djUsed = false;
+            let enemies = [];
+            let coinList = [];
+            let platforms = [];
+            let particles = [];
+            let cameraX = 0;
+            let animFrameId = null;
+            let lastFrame = 0;
+            let isMuted = false;
+            let heroImage = null;
+            let backgroundImage = null;
+            let enemyImages = [];
+            let selectedHeroIndex = -1;
+            let charImages = [];
+            let imagesLoaded = 0;
+            let totalImages = 0;
+            let animFrame = 0;
+            let animTimer = 0;
+            let comboCount = 0;
+            let comboTimer = 0;
+            let levelTransition = false;
+            let transitionTimer = 0;
+            let gameStartTime = 0;
+            let charSelectHover = -1;
+
+            // ============ AUDIO ELEMENTS ============
+            let audioCtx = null;
+            let masterGain = null;
+            let musicGain = null;
+            let sfxGain = null;
+            let musicInterval = null;
+            let audioReady = false;
+            let musicIndex = 0;
+            let bgmAudio = null;
+
+            const NOTES = {
+                C4: 261.63,
+                D4: 293.66,
+                E4: 329.63,
+                F4: 349.23,
+                G4: 392.0,
+                A4: 440.0,
+                B4: 493.88,
+                C5: 523.25,
+                D5: 587.33,
+                E5: 659.25,
+                G5: 783.99,
+                G3: 196.0,
+                A3: 220.0,
+                B3: 246.94
+            };
+            const BGM_SEQUENCE = [
+                { n: 'E4', d: 0.25 }, { n: 'G4', d: 0.25 }, { n: 'A4', d: 0.25 }, { n: 'G4', d: 0.15 },
+                { n: 'E4', d: 0.15 }, { n: 'C4', d: 0.25 }, { n: 'D4', d: 0.25 }, { n: 'E4', d: 0.25 },
+                { n: 'D4', d: 0.15 }, { n: 'C4', d: 0.15 }, { n: 'B4', d: 0.25 }, { n: 'C4', d: 0.3 },
+                { n: 'E4', d: 0.25 }, { n: 'G4', d: 0.25 }, { n: 'A4', d: 0.25 }, { n: 'E4', d: 0.3 },
+                { n: 'D4', d: 0.25 }, { n: 'C4', d: 0.3 }, { n: 'D4', d: 0.25 }, { n: 'E4', d: 0.35 },
+                { n: 'G4', d: 0.2 }, { n: 'A4', d: 0.2 }, { n: 'B4', d: 0.25 }, { n: 'A4', d: 0.2 },
+                { n: 'G4', d: 0.2 }, { n: 'E4', d: 0.3 }, { n: 'C4', d: 0.25 }, { n: 'D4', d: 0.3 }
+            ];
+
+            function initAudio() {
+                if (audioReady) return;
+                audioReady = true;
+                try {
+                    audioCtx = new(window.AudioContext || window.webkitAudioContext)();
+                    masterGain = audioCtx.createGain();
+                    masterGain.gain.value = isMuted ? 0 : 1;
+                    masterGain.connect(audioCtx.destination);
+                    musicGain = audioCtx.createGain();
+                    musicGain.gain.value = 0.12;
+                    musicGain.connect(masterGain);
+                    sfxGain = audioCtx.createGain();
+                    sfxGain.gain.value = 0.45;
+                    sfxGain.connect(masterGain);
+                } catch (e) {
+                    console.warn('WebAudio not available:', e);
+                }
+
+                bgmAudio = new Audio(BGM_URL);
+                bgmAudio.loop = true;
+                bgmAudio.volume = isMuted ? 0 : 0.5;
+                bgmAudio.addEventListener('error', function() {
+                    console.warn('BGM audio failed to load, using fallback procedural music.');
+                });
+            }
+
+            function startMusicLoop() {
+                if (bgmAudio && gameState === 'playing' && !bgmAudio.paused === false) {
+                    bgmAudio.play().catch(e => {
+                        console.warn('BGM play failed:', e);
+                        if (!musicInterval) {
+                            musicInterval = setInterval(() => {
+                                if (!audioCtx || isMuted || gameState !== 'playing') return;
+                                if (musicIndex >= BGM_SEQUENCE.length) musicIndex = 0;
+                                const step = BGM_SEQUENCE[musicIndex];
+                                playTone(step.n, step.d * 0.85, musicGain, 'sine', 0.12);
+                                musicIndex++;
+                            }, 300);
+                        }
+                    });
+                } else {
+                    if (!musicInterval && audioCtx && !isMuted) {
+                        musicInterval = setInterval(() => {
+                            if (!audioCtx || isMuted || gameState !== 'playing') return;
+                            if (musicIndex >= BGM_SEQUENCE.length) musicIndex = 0;
+                            const step = BGM_SEQUENCE[musicIndex];
+                            playTone(step.n, step.d * 0.85, musicGain, 'sine', 0.12);
+                            musicIndex++;
+                        }, 300);
+                    }
+                }
+            }
+
+            function stopMusic() {
+                if (bgmAudio) {
+                    bgmAudio.pause();
+                    bgmAudio.currentTime = 0;
+                }
+                if (musicInterval) {
+                    clearInterval(musicInterval);
+                    musicInterval = null;
+                }
+            }
+
+            function playTone(note, dur, gainNode, type, vol) {
+                if (!audioCtx || !gainNode || isMuted) return;
+                try {
+                    const f = NOTES[note] || 440;
+                    const o = audioCtx.createOscillator();
+                    const g = audioCtx.createGain();
+                    o.type = type || 'sine';
+                    o.frequency.value = f;
+                    g.gain.setValueAtTime(vol, audioCtx.currentTime);
+                    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+                    o.connect(g);
+                    g.connect(gainNode);
+                    o.start(audioCtx.currentTime);
+                    o.stop(audioCtx.currentTime + dur + 0.05);
+                } catch (e) {}
+            }
+
+            function sfx(name) {
+                if (!audioCtx || isMuted) return;
+                if (name === 'jump') {
+                    playTone('C5', 0.12, sfxGain, 'sine', 0.35);
+                    setTimeout(() => playTone('E5', 0.1, sfxGain, 'sine', 0.25), 50);
+                } else if (name === 'coin') {
+                    playTone('E5', 0.08, sfxGain, 'sine', 0.45);
+                    setTimeout(() => playTone('G5', 0.15, sfxGain, 'sine', 0.35), 60);
+                } else if (name === 'stomp') {
+                    playTone('G4', 0.15, sfxGain, 'sawtooth', 0.25);
+                    playTone('D4', 0.2, sfxGain, 'sine', 0.15);
+                } else if (name === 'power') {
+                    playTone('G4', 0.12, sfxGain, 'sine', 0.4);
+                    setTimeout(() => playTone('C5', 0.12, sfxGain, 'sine', 0.4), 70);
+                    setTimeout(() => playTone('E5', 0.2, sfxGain, 'sine', 0.4), 140);
+                } else if (name === 'hurt') {
+                    playTone('C4', 0.25, sfxGain, 'sawtooth', 0.35);
+                    playTone('G3', 0.2, sfxGain, 'sine', 0.25);
+                } else if (name === 'levelup') {
+                    [0, 90, 180, 270, 360].forEach((d, i) =>
+                        setTimeout(() => playTone(['C4', 'E4', 'G4', 'C5', 'E5'][i], 0.25, sfxGain, 'sine', 0.4),
+                            d)
+                    );
+                } else if (name === 'gameover') {
+                    [0, 120, 240, 360, 480].forEach((d, i) =>
+                        setTimeout(() => playTone(['E4', 'D4', 'C4', 'B3', 'A3'][i], 0.35, sfxGain, 'sawtooth', 0.3),
+                            d)
+                    );
+                } else if (name === 'select') {
+                    playTone('C5', 0.12, sfxGain, 'sine', 0.4);
+                    setTimeout(() => playTone('G5', 0.15, sfxGain, 'sine', 0.3), 60);
+                }
+            }
+
+            function toggleMute() {
+                isMuted = !isMuted;
+                if (masterGain) masterGain.gain.value = isMuted ? 0 : 1;
+                if (bgmAudio) bgmAudio.volume = isMuted ? 0 : 0.5;
+                updateMuteBtn();
+            }
+
+            function updateMuteBtn() {
+                if (isMuted) {
+                    btnMute.classList.add('muted');
+                    muteIcon.className = 'fa-solid fa-volume-xmark';
+                } else {
+                    btnMute.classList.remove('muted');
+                    muteIcon.className = 'fa-solid fa-volume-high';
+                }
+            }
+
+            // ============ IMAGE LOADING ============
+            function loadCharacterImages() {
+                charImages = [];
+                imagesLoaded = 0;
+                totalImages = CHARACTER_IMAGES.length + 1;
+                CHARACTER_IMAGES.forEach((src, i) => {
+                    const img = new Image();
+                    img.crossOrigin = 'anonymous';
+                    img.onload = () => { charImages[i] = img;
+                        imagesLoaded++;
+                        checkImagesReady(); };
+                    img.onerror = () => { imagesLoaded++;
+                        checkImagesReady(); };
+                    img.src = src;
+                });
+                backgroundImage = new Image();
+                backgroundImage.crossOrigin = 'anonymous';
+                backgroundImage.onload = () => { imagesLoaded++;
+                    checkImagesReady(); };
+                backgroundImage.onerror = () => { imagesLoaded++;
+                    checkImagesReady(); };
+                backgroundImage.src = BACKGROUND_UI_URL;
+            }
+
+            function checkImagesReady() {
+                if (imagesLoaded >= totalImages) {
+                    console.log('✅ All images loaded (or failed gracefully).');
+                }
+            }
+
+            function getHeroImage() { return heroImage; }
+
+            function getEnemyImage(index) { return enemyImages[index] || null; }
+
+            function getRandomEnemyImageIndex() { return Math.floor(Math.random() * enemyImages.length); }
+
+            // ============ SELECT HERO ============
+            function selectHero(index) {
+                if (index < 0 || index >= CHARACTER_IMAGES.length) return;
+                selectedHeroIndex = index;
+                heroImage = charImages[index] || null;
+                enemyImages = [];
+                CHARACTER_IMAGES.forEach((src, i) => {
+                    if (i !== index && charImages[i]) {
+                        enemyImages.push(charImages[i]);
+                    }
+                });
+                sfx('select');
+            }
+
+            // ============ LEVEL GENERATION ============
+            function generateLevel(lvl) {
+                enemies = [];
+                coinList = [];
+                platforms = [];
+                particles = [];
+                playerX = 80;
+                playerY = GROUND_Y - PLAYER_H;
+                playerVX = 0;
+                playerVY = 0;
+                isGrounded = false;
+                bigMode = false;
+                bigTimer = 0;
+                starMode = false;
+                starTimer = 0;
+                invincible = false;
+                invincibleTimer = 0;
+                doubleJump = lvl >= 3;
+                djUsed = false;
+                cameraX = 0;
+                comboCount = 0;
+                comboTimer = 0;
+
+                const numPlatforms = Math.min(8 + lvl * 3, 40);
+                for (let i = 0; i < numPlatforms; i++) {
+                    const pw = 70 + Math.random() * 110;
+                    const px = 180 + i * (130 + Math.random() * 55) + Math.random() * 40;
+                    const py = Math.max(80, GROUND_Y - 70 - Math.random() * (230 - lvl * 10));
+                    platforms.push({ x: px, y: py, w: pw, h: 18, type: 'platform' });
+                }
+
+                const numEnemies = Math.min(5 + lvl * 2, 25);
+                for (let i = 0; i < numEnemies; i++) {
+                    const ex = 250 + Math.random() * (WORLD_WIDTH - 350);
+                    const enemyImgIdx = getRandomEnemyImageIndex();
+                    enemies.push({
+                        x: ex,
+                        y: GROUND_Y - ENEMY_H,
+                        w: ENEMY_W,
+                        h: ENEMY_H,
+                        vx: (0.5 + lvl * 0.15) * (Math.random() > 0.5 ? 1 : -1),
+                        active: true,
+                        type: 'walker',
+                        squished: false,
+                        squishTimer: 0,
+                        imgIndex: enemyImgIdx,
+                    });
+                }
+
+                if (lvl >= 2 && enemyImages.length > 1) {
+                    const numFlyers = Math.min(lvl, enemyImages.length - 1);
+                    for (let i = 0; i < numFlyers; i++) {
+                        const flyer = {
+                            x: 400 + Math.random() * (WORLD_WIDTH - 500),
+                            y: GROUND_Y - 90 - Math.random() * 130,
+                            w: ENEMY_W,
+                            h: ENEMY_H,
+                            vx: (0.7 + lvl * 0.2) * (Math.random() > 0.5 ? 1 : -1),
+                            active: true,
+                            type: 'flyer',
+                            squished: false,
+                            squishTimer: 0,
+                            baseY: 0,
+                            phase: Math.random() * Math.PI * 2,
+                            imgIndex: getRandomEnemyImageIndex(),
+                        };
+                        flyer.baseY = flyer.y;
+                        enemies.push(flyer);
+                    }
+                }
+
+                const numCoins = Math.min(12 + lvl * 4, 50);
+                for (let i = 0; i < numCoins; i++) {
+                    const cx = 130 + Math.random() * (WORLD_WIDTH - 180);
+                    const cy = GROUND_Y - 25 - Math.random() * 280;
+                    coinList.push({ x: cx, y: Math.max(35, cy), collected: false, phase: Math.random() * Math.PI * 2,
+                        size: 16, isPowerup: false, powerType: null });
+                }
+
+                if (Math.random() > 0.35) {
+                    coinList.push({ x: 500 + Math.random() * 700, y: GROUND_Y - 50, collected: false, phase: 0,
+                        size: 22, isPowerup: true, powerType: 'mushroom' });
+                }
+                if (lvl >= 2 && Math.random() > 0.45) {
+                    coinList.push({ x: 900 + Math.random() * 900, y: GROUND_Y - 50, collected: false, phase: 0,
+                        size: 22, isPowerup: true, powerType: 'star' });
+                }
+                if (lvl >= 4 && Math.random() > 0.6) {
+                    coinList.push({ x: 1400 + Math.random() * 800, y: GROUND_Y - 50, collected: false, phase: 0,
+                        size: 22, isPowerup: true, powerType: 'mushroom' });
+                }
+            }
+
+            function resetGame() {
+                lives = 3;
+                score = 0;
+                coins = 0;
+                level = 1;
+                gameState = 'select';
+                levelTransition = false;
+                transitionTimer = 0;
+                comboCount = 0;
+                comboTimer = 0;
+                stopMusic();
+                updateScoreBar();
+            }
+
+            function startGame() {
+                initAudio();
+                resetGame();
+                generateLevel(1);
+                gameState = 'playing';
+                gameStartTime = Date.now();
+                lastFrame = 0;
+                updateScoreBar();
+                startMusicLoop();
+                if (animFrameId) cancelAnimationFrame(animFrameId);
+                animFrameId = requestAnimationFrame(gameLoop);
+            }
+
+            function goNextLevel() {
+                level++;
+                levelTransition = true;
+                transitionTimer = 50;
+                sfx('levelup');
+                if (level > MAX_LEVEL) {
+                    level = 1;
+                    generateLevel(1);
+                } else {
+                    generateLevel(level);
+                }
+                playerX = 80;
+                playerY = GROUND_Y - PLAYER_H;
+                playerVX = 0;
+                playerVY = 0;
+                cameraX = 0;
+                updateScoreBar();
+            }
+
+            function respawnPlayer() {
+                lives--;
+                if (lives <= 0) {
+                    gameState = 'gameover';
+                    sfx('gameover');
+                    stopMusic();
+                    if (animFrameId) cancelAnimationFrame(animFrameId);
+                    drawGameOverScreen();
+                    return;
+                }
+                playerX = 80;
+                playerY = GROUND_Y - PLAYER_H;
+                playerVX = 0;
+                playerVY = 0;
+                invincible = true;
+                invincibleTimer = 100;
+                bigMode = false;
+                bigTimer = 0;
+                starMode = false;
+                starTimer = 0;
+                updateScoreBar();
+            }
+
+            function updateScoreBar() {
+                scoreBar.innerHTML =
+                    `<i class="fa-solid fa-star" style="color:#ffd700;"></i> SCORE: ${score} | <i class="fa-solid fa-heart" style="color:#ff5252;"></i> ${lives} | <i class="fa-solid fa-layer-group" style="color:#4fc3f7;"></i> Lv.${level}`;
+            }
+
+            // ============ PHYSICS & UPDATE ============
+            function updatePlayer(dt) {
+                const ts = dt / 16.67;
+                playerVY += GRAVITY * ts;
+                if (playerVY > 15) playerVY = 15;
+                playerY += playerVY * ts;
+                playerVX = MOVE_SPEED + (bigMode ? 0.4 : 0) + (starMode ? 1.2 : 0);
+                playerX += playerVX * ts;
+
+                if (playerX < 0) playerX = 0;
+                if (playerX > WORLD_WIDTH - PLAYER_W) playerX = WORLD_WIDTH - PLAYER_W;
+
+                if (playerY + PLAYER_H >= GROUND_Y) {
+                    playerY = GROUND_Y - PLAYER_H;
+                    playerVY = 0;
+                    isGrounded = true;
+                    djUsed = false;
+                } else {
+                    isGrounded = false;
+                }
+
+                for (const p of platforms) {
+                    if (playerX + PLAYER_W > p.x && playerX < p.x + p.w && playerVY > 0 &&
+                        playerY + PLAYER_H >= p.y && playerY + PLAYER_H <= p.y + p.h + Math.abs(playerVY) + 5) {
+                        playerY = p.y - PLAYER_H;
+                        playerVY = 0;
+                        isGrounded = true;
+                        djUsed = false;
+                    }
+                }
+
+                if (playerY < 0) { playerY = 0;
+                    playerVY = 0; }
+                if (invincibleTimer > 0) { invincibleTimer -= ts; if (invincibleTimer <= 0) invincible = false; }
+                if (bigTimer > 0) { bigTimer -= ts; if (bigTimer <= 0) bigMode = false; }
+                if (starTimer > 0) { starTimer -= ts; if (starTimer <= 0) starMode = false; }
+                if (comboTimer > 0) { comboTimer -= ts; if (comboTimer <= 0) comboCount = 0; }
+
+                cameraX = playerX - W * 0.3;
+                if (cameraX < 0) cameraX = 0;
+                if (cameraX > WORLD_WIDTH - W) cameraX = WORLD_WIDTH - W;
+
+                animTimer += ts;
+                if (animTimer > 10) { animTimer = 0;
+                    animFrame = (animFrame + 1) % Math.max(1, enemyImages.length); }
+                if (playerVX > 0) facing = 1;
+                else if (playerVX < 0) facing = -1;
+            }
+
+            function updateEnemies(dt) {
+                const ts = dt / 16.67;
+                enemies.forEach(e => {
+                    if (!e.active) return;
+                    if (e.squished) { e.squishTimer -= ts; if (e.squishTimer <= 0) e.active = false;
+                        return; }
+                    if (e.type === 'flyer') { e.phase += 0.05 * ts;
+                        e.y = e.baseY + Math.sin(e.phase) * 35;
+                        e.x += e.vx * ts; } else { e.x += e.vx * ts;
+                        e.y = GROUND_Y - e.h; }
+                    if (e.x <= 0 || e.x >= WORLD_WIDTH - e.w) e.vx *= -1;
+                });
+                enemies = enemies.filter(e => e.active || e.squished);
+            }
+
+            function checkCollisions() {
+                for (const e of enemies) {
+                    if (!e.active || e.squished) continue;
+                    const overlap = playerX + PLAYER_W > e.x && playerX < e.x + e.w &&
+                        playerY + PLAYER_H > e.y && playerY < e.y + e.h;
+                    if (!overlap) continue;
+                    if (playerVY > 0 && playerY + PLAYER_H - e.y < 14) {
+                        e.squished = true;
+                        e.squishTimer = 25;
+                        playerVY = JUMP_FORCE * 0.65;
+                        sfx('stomp');
+                        comboCount++;
+                        comboTimer = 80;
+                        score += 100 * comboCount;
+                        spawnParticles(e.x + e.w / 2, e.y + e.h / 2, 8, 'rgba(255,200,100,0.7)', 5);
+                        updateScoreBar();
+                    } else if (!invincible && !starMode) {
+                        sfx('hurt');
+                        spawnParticles(playerX + PLAYER_W / 2, playerY + PLAYER_H / 2, 12, 'rgba(255,80,80,0.8)',
+                            6);
+                        if (bigMode) { bigMode = false;
+                            bigTimer = 0;
+                            invincible = true;
+                            invincibleTimer = 50; } else { respawnPlayer(); if (gameState === 'gameover')
+                            return; }
+                    } else if (starMode) {
+                        e.active = false;
+                        score += 200;
+                        sfx('stomp');
+                        spawnParticles(e.x + e.w / 2, e.y + e.h / 2, 18, 'rgba(255,255,180,0.9)', 7);
+                        updateScoreBar();
+                    }
+                }
+
+                for (const c of coinList) {
+                    if (c.collected) continue;
+                    const cSize = c.size;
+                    if (playerX + PLAYER_W > c.x - cSize && playerX < c.x + cSize &&
+                        playerY + PLAYER_H > c.y - cSize && playerY < c.y + cSize) {
+                        c.collected = true;
+                        if (c.isPowerup) {
+                            sfx('power');
+                            if (c.powerType === 'mushroom') { bigMode = true;
+                                bigTimer = 500; } else if (c.powerType === 'star') { starMode = true;
+                                starTimer = 400; }
+                            score += 400;
+                            spawnParticles(c.x, c.y, 14, 'rgba(255,215,0,1)', 5);
+                        } else {
+                            sfx('coin');
+                            coins++;
+                            score += 50;
+                            spawnParticles(c.x, c.y, 6, 'rgba(255,215,0,0.8)', 4);
+                        }
+                        updateScoreBar();
+                    }
+                }
+
+                if (playerY > H + 60) { sfx('hurt');
+                    respawnPlayer(); if (gameState === 'gameover') return; }
+            }
+
+            function spawnParticles(x, y, count, color, spread) {
+                for (let i = 0; i < count; i++) {
+                    particles.push({ x, y, vx: (Math.random() - 0.5) * spread, vy: -Math.random() * spread * 0.6 - 1,
+                        life: 0.4 + Math.random() * 0.5, maxLife: 0.4 + Math.random() * 0.5, size: 2 + Math
+                            .random() * 3.5, color, gravity: 0.18 });
+                }
+            }
+
+            function updateParticles(dt) {
+                const ts = dt / 16.67;
+                particles = particles.filter(p => {
+                    p.life -= 0.016 * ts;
+                    p.x += p.vx * ts;
+                    p.y += p.vy * ts;
+                    p.vy += p.gravity * ts;
+                    return p.life > 0;
+                });
+            }
+
+            // ============ DRAWING ============
+            function drawBackground() {
+                if (backgroundImage && backgroundImage.complete && backgroundImage.naturalWidth > 0) {
+                    ctx.drawImage(backgroundImage, 0, 0, W, H);
+                } else {
+                    const grad = ctx.createLinearGradient(0, 0, 0, H);
+                    grad.addColorStop(0, '#1a1a3e');
+                    grad.addColorStop(0.5, '#2a2a5e');
+                    grad.addColorStop(1, '#3a3a6e');
+                    ctx.fillStyle = grad;
+                    ctx.fillRect(0, 0, W, H);
+                }
+                ctx.fillStyle = 'rgba(0,0,0,0.3)';
+                ctx.fillRect(0, 0, W, H);
+
+                for (let i = 0; i < 25; i++) {
+                    const sx = (i * 83 + 17) % W;
+                    const sy = (i * 47 + 9) % (H * 0.5);
+                    const tw = Math.sin(Date.now() * 0.001 + i) * 0.5 + 0.5;
+                    ctx.fillStyle = `rgba(255,255,255,${tw * 0.4})`;
+                    ctx.beginPath();
+                    ctx.arc(sx, sy, 1 + tw, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            function drawGround() {
+                const grad = ctx.createLinearGradient(0, GROUND_Y, 0, H);
+                grad.addColorStop(0, '#4a7a3a');
+                grad.addColorStop(0.4, '#3a5a2a');
+                grad.addColorStop(1, '#1a2a10');
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, GROUND_Y, W, H - GROUND_Y);
+                ctx.fillStyle = '#6aaa4a';
+                ctx.fillRect(0, GROUND_Y, W, 3);
+                ctx.fillStyle = 'rgba(0,0,0,0.15)';
+                for (let i = 0; i < W; i += 36) {
+                    const off = (Math.floor(i / 36) % 2) * 18;
+                    for (let j = GROUND_Y + 10 + off; j < H; j += 18) {
+                        ctx.fillRect(i, j, 34, 2);
+                    }
+                }
+            }
+
+            function drawPlayer() {
+                const img = getHeroImage();
+                const px = playerX - cameraX;
+                const py = playerY;
+                const scale = bigMode ? 1.25 : 1;
+                const dw = PLAYER_W * scale;
+                const dh = PLAYER_H * scale;
+
+                if (invincible && Math.floor(Date.now() / 90) % 2 === 0) return;
+
+                ctx.save();
+                ctx.fillStyle = 'rgba(0,0,0,0.3)';
+                ctx.beginPath();
+                ctx.ellipse(px + dw / 2, GROUND_Y + 6, dw * 0.4, 6, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                if (img && img.complete && img.naturalWidth > 0) {
+                    if (facing < 0) {
+                        ctx.save();
+                        ctx.translate(px + dw, py);
+                        ctx.scale(-1, 1);
+                        ctx.drawImage(img, 0, 0, dw, dh);
+                        ctx.restore();
+                    } else {
+                        ctx.drawImage(img, px, py, dw, dh);
+                    }
+                    if (starMode) {
+                        ctx.fillStyle = 'rgba(255,255,150,0.8)';
+                        for (let i = 0; i < 5; i++) {
+                            const angle = Date.now() * 0.004 + i * Math.PI * 2 / 5;
+                            const sx = px + dw / 2 + Math.cos(angle) * (dw * 0.7);
+                            const sy = py + dh / 2 + Math.sin(angle) * (dh * 0.7);
+                            ctx.beginPath();
+                            ctx.arc(sx, sy, 4, 0, Math.PI * 2);
+                            ctx.fill();
+                        }
+                    }
+                    if (bigMode) {
+                        ctx.strokeStyle = 'rgba(255,180,180,0.7)';
+                        ctx.lineWidth = 2;
+                        ctx.beginPath();
+                        ctx.roundRect(px - 3, py - 3, dw + 6, dh + 6, 5);
+                        ctx.stroke();
+                    }
+                } else {
+                    ctx.fillStyle = '#cc4400';
+                    ctx.beginPath();
+                    ctx.roundRect(px, py, dw, dh, 4);
+                    ctx.fill();
+                    ctx.fillStyle = '#ffcc99';
+                    ctx.beginPath();
+                    ctx.arc(px + dw / 2, py + 5, dw * 0.3, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                ctx.restore();
+            }
+
+            function drawEnemies() {
+                enemies.forEach(e => {
+                    if (!e.active && !e.squished) return;
+                    const ex = e.x - cameraX;
+                    const ey = e.y;
+                    ctx.save();
+                    if (e.squished) {
+                        ctx.fillStyle = '#8b6b4a';
+                        ctx.beginPath();
+                        ctx.ellipse(ex + e.w / 2, ey + e.h * 0.8, e.w * 0.5, e.h * 0.25, 0, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.fillStyle = 'rgba(255,255,255,0.3)';
+                        ctx.beginPath();
+                        ctx.ellipse(ex + e.w * 0.35, ey + e.h * 0.75, 3, 2, 0, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.beginPath();
+                        ctx.ellipse(ex + e.w * 0.65, ey + e.h * 0.75, 3, 2, 0, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.restore();
+                        return;
+                    }
+                    const eImg = getEnemyImage(e.imgIndex);
+                    if (eImg && eImg.complete && eImg.naturalWidth > 0) {
+                        const eDir = e.vx > 0 ? 1 : -1;
+                        if (e.type === 'flyer') {
+                            ctx.save();
+                            ctx.translate(ex + e.w / 2, ey + e.h / 2);
+                            ctx.rotate(Math.sin(e.phase) * 0.1);
+                            if (eDir < 0) ctx.scale(-1, 1);
+                            ctx.drawImage(eImg, -e.w / 2, -e.h / 2, e.w, e.h);
+                            ctx.restore();
+                            const wp = Math.sin(Date.now() * 0.02) * 4;
+                            ctx.fillStyle = 'rgba(255,200,255,0.5)';
+                            ctx.beginPath();
+                            ctx.ellipse(ex - 5, ey + e.h / 2 - wp, e.w * 0.25, e.h * 0.2, 0.3, 0, Math.PI * 2);
+                            ctx.fill();
+                            ctx.beginPath();
+                            ctx.ellipse(ex + e.w + 5, ey + e.h / 2 - wp, e.w * 0.25, e.h * 0.2, -0.3, 0, Math.PI *
+                                2);
+                            ctx.fill();
+                        } else {
+                            if (eDir < 0) {
+                                ctx.save();
+                                ctx.translate(ex + e.w, ey);
+                                ctx.scale(-1, 1);
+                                ctx.drawImage(eImg, 0, 0, e.w, e.h);
+                                ctx.restore();
+                            } else {
+                                ctx.drawImage(eImg, ex, ey, e.w, e.h);
+                            }
+                        }
+                        ctx.fillStyle = '#fff';
+                        ctx.beginPath();
+                        ctx.arc(ex + e.w * 0.3, ey + e.h * 0.3, 4, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.beginPath();
+                        ctx.arc(ex + e.w * 0.7, ey + e.h * 0.3, 4, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.fillStyle = '#1a1a1a';
+                        ctx.beginPath();
+                        ctx.arc(ex + e.w * 0.3 + (e.vx > 0 ? 1 : -1), ey + e.h * 0.3, 2, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.beginPath();
+                        ctx.arc(ex + e.w * 0.7 + (e.vx > 0 ? 1 : -1), ey + e.h * 0.3, 2, 0, Math.PI * 2);
+                        ctx.fill();
+                    } else {
+                        ctx.fillStyle = '#8b6b4a';
+                        ctx.beginPath();
+                        ctx.ellipse(ex + e.w / 2, ey + e.h / 2, e.w * 0.5, e.h * 0.45, 0, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.fillStyle = '#fff';
+                        ctx.beginPath();
+                        ctx.arc(ex + e.w * 0.35, ey + e.h * 0.35, 4, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.beginPath();
+                        ctx.arc(ex + e.w * 0.65, ey + e.h * 0.35, 4, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.fillStyle = '#1a1a1a';
+                        ctx.beginPath();
+                        ctx.arc(ex + e.w * 0.35, ey + e.h * 0.35, 2, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.beginPath();
+                        ctx.arc(ex + e.w * 0.65, ey + e.h * 0.35, 2, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                    ctx.restore();
+                });
+            }
+
+            function drawCoins() {
+                coinList.forEach(c => {
+                    if (c.collected) return;
+                    const cx = c.x - cameraX;
+                    const cy = c.y + Math.sin(Date.now() * 0.004 + c.phase) * 3;
+                    ctx.save();
+                    if (c.isPowerup) {
+                        ctx.shadowColor = c.powerType === 'star' ? 'rgba(255,255,100,0.8)' :
+                            'rgba(255,100,100,0.8)';
+                        ctx.shadowBlur = 12;
+                        if (c.powerType === 'mushroom') {
+                            ctx.fillStyle = '#cc2222';
+                            ctx.beginPath();
+                            ctx.arc(cx, cy - 4, 9, Math.PI, 0);
+                            ctx.fill();
+                            ctx.fillStyle = '#ffcc99';
+                            ctx.beginPath();
+                            ctx.roundRect(cx - 6, cy - 4, 12, 10, 2);
+                            ctx.fill();
+                            ctx.fillStyle = '#fff';
+                            ctx.beginPath();
+                            ctx.arc(cx - 2, cy - 2, 2.5, 0, Math.PI * 2);
+                            ctx.fill();
+                            ctx.beginPath();
+                            ctx.arc(cx + 4, cy - 2, 2.5, 0, Math.PI * 2);
+                            ctx.fill();
+                        } else {
+                            ctx.fillStyle = '#ffd700';
+                            ctx.beginPath();
+                            for (let i = 0; i < 10; i++) {
+                                const angle = i * Math.PI / 5 - Math.PI / 2;
+                                const r = i % 2 === 0 ? 11 : 4;
+                                const sx = cx + Math.cos(angle) * r;
+                                const sy = cy + Math.sin(angle) * r;
+                                if (i === 0) ctx.moveTo(sx, sy);
+                                else ctx.lineTo(sx, sy);
+                            }
+                            ctx.closePath();
+                            ctx.fill();
+                            ctx.strokeStyle = '#cc9900';
+                            ctx.lineWidth = 1.5;
+                            ctx.stroke();
+                            ctx.fillStyle = 'rgba(255,255,255,0.5)';
+                            ctx.beginPath();
+                            ctx.arc(cx - 3, cy - 3, 3, 0, Math.PI * 2);
+                            ctx.fill();
+                        }
+                    } else {
+                        ctx.shadowColor = 'rgba(255,215,0,0.5)';
+                        ctx.shadowBlur = 6;
+                        ctx.fillStyle = '#ffd700';
+                        ctx.beginPath();
+                        ctx.arc(cx, cy, c.size * 0.5, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.strokeStyle = '#cc9900';
+                        ctx.lineWidth = 1.5;
+                        ctx.stroke();
+                        ctx.fillStyle = '#ffe566';
+                        ctx.beginPath();
+                        ctx.arc(cx - 2, cy - 2, c.size * 0.16, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.fillStyle = 'rgba(255,255,255,0.4)';
+                        ctx.beginPath();
+                        ctx.arc(cx - c.size * 0.15, cy - c.size * 0.2, c.size * 0.1, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                    ctx.restore();
+                });
+            }
+
+            function drawPlatforms() {
+                platforms.forEach(p => {
+                    const px = p.x - cameraX;
+                    const py = p.y;
+                    if (px + p.w < 0 || px > W) return;
+                    const grad = ctx.createLinearGradient(px, py, px, py + p.h);
+                    grad.addColorStop(0, '#8b6b4a');
+                    grad.addColorStop(0.5, '#6b4a2a');
+                    grad.addColorStop(1, '#4a2a1a');
+                    ctx.fillStyle = grad;
+                    ctx.beginPath();
+                    ctx.roundRect(px, py, p.w, p.h, 3);
+                    ctx.fill();
+                    ctx.strokeStyle = '#3a1a0a';
+                    ctx.lineWidth = 1.5;
+                    ctx.stroke();
+                    ctx.fillStyle = '#5a9a3a';
+                    ctx.fillRect(px, py, p.w, 3);
+                    ctx.fillStyle = 'rgba(255,255,255,0.1)';
+                    ctx.fillRect(px + 2, py + 3, p.w - 4, 2);
+                });
+            }
+
+            function drawParticles() {
+                particles.forEach(p => {
+                    const alpha = Math.max(0, p.life / p.maxLife);
+                    ctx.globalAlpha = alpha;
+                    ctx.fillStyle = p.color;
+                    ctx.beginPath();
+                    ctx.arc(p.x - cameraX, p.y, p.size * alpha, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+                ctx.globalAlpha = 1;
+            }
+
+            function drawHUD() {
+                ctx.save();
+                ctx.fillStyle = 'rgba(0,0,0,0.4)';
+                ctx.beginPath();
+                ctx.roundRect(8, 8, 135, 24, 12);
+                ctx.fill();
+
+                ctx.font = faFont(12);
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'middle';
+                ctx.fillStyle = '#ff5252';
+                ctx.fillText('\uf004', 16, 20);
+                ctx.font = 'bold 12px "Segoe UI", Arial, sans-serif';
+                ctx.fillStyle = '#fff';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(`${lives}`, 30, 21);
+
+                ctx.font = faFont(12);
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'middle';
+                ctx.fillStyle = '#ffd700';
+                ctx.fillText('\uf51e', 58, 20);
+                ctx.font = 'bold 12px "Segoe UI", Arial, sans-serif';
+                ctx.fillStyle = '#fff';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(`${coins}`, 72, 21);
+
+                if (starMode || bigMode) {
+                    let iy = 38;
+                    if (starMode) {
+                        ctx.fillStyle = 'rgba(255,215,0,0.7)';
+                        ctx.beginPath();
+                        ctx.roundRect(8, iy, 98, 18, 9);
+                        ctx.fill();
+                        ctx.font = faFont(10);
+                        ctx.textAlign = 'left';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillStyle = '#1a1a1a';
+                        ctx.fillText('\uf005', 14, iy + 9);
+                        ctx.font = 'bold 10px "Segoe UI", Arial, sans-serif';
+                        ctx.textAlign = 'left';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillStyle = '#1a1a1a';
+                        ctx.fillText(`${Math.ceil(starTimer/60)}s`, 28, iy + 10);
+                        iy += 20;
+                    }
+                    if (bigMode) {
+                        ctx.fillStyle = 'rgba(255,100,100,0.7)';
+                        ctx.beginPath();
+                        ctx.roundRect(8, iy, 98, 18, 9);
+                        ctx.fill();
+                        ctx.font = faFont(10);
+                        ctx.textAlign = 'left';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillStyle = '#1a1a1a';
+                        ctx.fillText('\uf3ed', 14, iy + 9);
+                        ctx.font = 'bold 10px "Segoe UI", Arial, sans-serif';
+                        ctx.textAlign = 'left';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillStyle = '#1a1a1a';
+                        ctx.fillText(`${Math.ceil(bigTimer/60)}s`, 28, iy + 10);
+                    }
+                }
+                if (comboCount > 1 && comboTimer > 0) {
+                    ctx.fillStyle = '#ffd700';
+                    ctx.font = 'bold 16px "Segoe UI", Arial, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(`${comboCount}x COMBO!`, W / 2, 38);
+                    ctx.fillStyle = 'rgba(255,215,0,0.3)';
+                    ctx.beginPath();
+                    ctx.roundRect(W / 2 - 50, 42, 100, 6, 3);
+                    ctx.fill();
+                    ctx.fillStyle = '#ffd700';
+                    ctx.beginPath();
+                    ctx.roundRect(W / 2 - 48, 44, 96 * (comboTimer / 80), 2, 1);
+                    ctx.fill();
+                }
+                ctx.restore();
+            }
+
+            function drawCharacterSelectScreen() {
+                ctx.fillStyle = '#0a0a1a';
+                ctx.fillRect(0, 0, W, H);
+                drawBackground();
+                ctx.fillStyle = 'rgba(0,0,0,0.6)';
+                ctx.fillRect(0, 0, W, H);
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+
+                ctx.fillStyle = '#ffd700';
+                ctx.font = 'bold 26px "Segoe UI", Arial, sans-serif';
+                ctx.fillText('SELECT YOUR HERO', W / 2, 70);
+
+                ctx.font = faFont(18);
+                ctx.fillStyle = '#4fc3f7';
+                ctx.fillText('\uf11b', W / 2, 52);
+
+                ctx.fillStyle = '#fff';
+                ctx.font = '14px "Segoe UI", Arial, sans-serif';
+                ctx.fillText('Choose a character – rest become enemies!', W / 2, 98);
+
+                const cols = 3;
+                const rows = 2;
+                const cellW = 130;
+                const cellH = 130;
+                const startX = (W - cols * cellW) / 2;
+                const startY = 130;
+                const gapX = 12;
+                const gapY = 15;
+
+                for (let i = 0; i < CHARACTER_IMAGES.length; i++) {
+                    const col = i % cols;
+                    const row = Math.floor(i / cols);
+                    const cx = startX + col * (cellW + gapX);
+                    const cy = startY + row * (cellH + gapY);
+                    const isHovered = charSelectHover === i;
+
+                    ctx.fillStyle = isHovered ? 'rgba(255,215,0,0.25)' : 'rgba(255,255,255,0.08)';
+                    ctx.beginPath();
+                    ctx.roundRect(cx, cy, cellW, cellH, 10);
+                    ctx.fill();
+
+                    if (isHovered) {
+                        ctx.strokeStyle = '#ffd700';
+                        ctx.lineWidth = 3;
+                        ctx.beginPath();
+                        ctx.roundRect(cx, cy, cellW, cellH, 10);
+                        ctx.stroke();
+                    } else {
+                        ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+                        ctx.lineWidth = 1.5;
+                        ctx.beginPath();
+                        ctx.roundRect(cx, cy, cellW, cellH, 10);
+                        ctx.stroke();
+                    }
+
+                    const imgSize = 80;
+                    const imgX = cx + (cellW - imgSize) / 2;
+                    const imgY = cy + 12;
+                    if (charImages[i] && charImages[i].complete && charImages[i].naturalWidth > 0) {
+                        ctx.save();
+                        if (isHovered) {
+                            ctx.shadowColor = 'rgba(255,215,0,0.6)';
+                            ctx.shadowBlur = 15;
+                        }
+                        ctx.drawImage(charImages[i], imgX, imgY, imgSize, imgSize);
+                        ctx.restore();
+                    } else {
+                        ctx.fillStyle = '#666';
+                        ctx.beginPath();
+                        ctx.roundRect(imgX, imgY, imgSize, imgSize, 6);
+                        ctx.fill();
+                        ctx.font = faFont(30);
+                        ctx.fillStyle = '#fff';
+                        ctx.fillText('\uf11b', cx + cellW / 2, imgY + imgSize / 2 + 2);
+                    }
+
+                    ctx.fillStyle = isHovered ? '#ffd700' : '#ccc';
+                    ctx.font = 'bold 12px "Segoe UI", Arial, sans-serif';
+                    ctx.fillText(`Character ${i + 1}`, cx + cellW / 2, cy + cellH - 12);
+                }
+
+                ctx.fillStyle = '#ffd700';
+                ctx.font = 'bold 15px "Segoe UI", Arial, sans-serif';
+                ctx.fillText('⬆ Tap a character to select', W / 2, startY + rows * (cellH + gapY) + 25);
+
+                ctx.fillStyle = 'rgba(255,255,255,0.35)';
+                ctx.font = '11px "Segoe UI", Arial, sans-serif';
+                ctx.fillText('R = Restart | M = Mute | 1-5 = Quick Select', W / 2, H - 20);
+            }
+
+            function drawGameOverScreen() {
+                ctx.fillStyle = 'rgba(0,0,0,0.7)';
+                ctx.fillRect(0, 0, W, H);
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+
+                ctx.font = faFont(36);
+                ctx.fillStyle = '#ff4444';
+                ctx.fillText('\uf11b', W / 2, 150);
+
+                ctx.fillStyle = '#ff4444';
+                ctx.font = 'bold 40px "Segoe UI", Arial, sans-serif';
+                ctx.fillText('GAME OVER', W / 2, 215);
+
+                ctx.fillStyle = '#fff';
+                ctx.font = '26px "Segoe UI", Arial, sans-serif';
+                ctx.fillText(`Score: ${score}`, W / 2, 255);
+
+                ctx.fillStyle = '#ffd700';
+                ctx.font = '20px "Segoe UI", Arial, sans-serif';
+                ctx.fillText(`Level: ${level} | Coins: ${coins}`, W / 2, 295);
+
+                ctx.fillStyle = '#ccc';
+                ctx.font = '14px "Segoe UI", Arial, sans-serif';
+                const elapsed = Math.floor((Date.now() - gameStartTime) / 1000);
+                ctx.fillText(`Time: ${Math.floor(elapsed/60)}m ${elapsed%60}s`, W / 2, 325);
+
+                const btnX = W / 2 - 85;
+                const btnY = 370;
+                const btnW = 170;
+                const btnH = 50;
+                const grad = ctx.createLinearGradient(btnX, btnY, btnX + btnW, btnY + btnH);
+                grad.addColorStop(0, '#ff5252');
+                grad.addColorStop(1, '#ff8c00');
+                ctx.fillStyle = grad;
+                ctx.beginPath();
+                ctx.roundRect(btnX, btnY, btnW, btnH, 25);
+                ctx.fill();
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                ctx.fillStyle = '#fff';
+                ctx.font = 'bold 20px "Segoe UI", Arial, sans-serif';
+                ctx.fillText('RESTART', W / 2, btnY + 25);
+                ctx.font = faFont(14);
+                ctx.fillStyle = 'rgba(255,255,255,0.8)';
+                ctx.fillText('\uf2f1', W / 2 + 55, btnY + 25);
+
+                ctx.fillStyle = '#ccc';
+                ctx.font = '14px "Segoe UI", Arial, sans-serif';
+                ctx.fillText('Tap anywhere or press SPACE', W / 2, btnY + 75);
+            }
+
+            // ============ MAIN GAME LOOP ============
+            function gameLoop(timestamp) {
+                if (gameState !== 'playing') {
+                    if (gameState === 'gameover') drawGameOverScreen();
+                    else if (gameState === 'select') drawCharacterSelectScreen();
+                    return;
+                }
+                const now = Date.now();
+                const dt = lastFrame === 0 ? 16.67 : Math.min(now - lastFrame, 50);
+                lastFrame = now;
+                const ts = dt / 16.67;
+
+                if (levelTransition) {
+                    transitionTimer -= ts;
+                    if (transitionTimer <= 0) levelTransition = false;
+                }
+
+                if (!levelTransition || transitionTimer > 25) {
+                    updatePlayer(dt);
+                    updateEnemies(dt);
+                    checkCollisions();
+                    if (gameState === 'gameover') { drawGameOverScreen(); return; }
+                }
+                updateParticles(dt);
+
+                if (playerX >= WORLD_WIDTH - 70) { goNextLevel(); }
+
+                ctx.save();
+                drawBackground();
+                drawPlatforms();
+                drawCoins();
+                drawEnemies();
+                drawPlayer();
+                drawParticles();
+                drawGround();
+                drawHUD();
+                if (levelTransition) {
+                    ctx.fillStyle = `rgba(255,255,255,${Math.min(1, transitionTimer / 35)})`;
+                    ctx.fillRect(0, 0, W, H);
+                    ctx.fillStyle = '#ffd700';
+                    ctx.font = 'bold 28px "Segoe UI", Arial, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(`LEVEL ${level}`, W / 2, H / 2);
+                }
+                ctx.restore();
+
+                animFrameId = requestAnimationFrame(gameLoop);
+            }
+
+            // ============ INPUT ============
+            function handleJump() {
+                if (gameState === 'playing') {
+                    if (isGrounded) {
+                        playerVY = JUMP_FORCE;
+                        isGrounded = false;
+                        djUsed = false;
+                        sfx('jump');
+                        spawnParticles(playerX + PLAYER_W / 2, playerY + PLAYER_H, 5, 'rgba(255,255,255,0.6)', 3);
+                    } else if (doubleJump && !djUsed) {
+                        playerVY = JUMP_FORCE * 0.9;
+                        djUsed = true;
+                        sfx('jump');
+                        spawnParticles(playerX + PLAYER_W / 2, playerY + PLAYER_H, 8, 'rgba(255,200,255,0.7)', 4);
+                    }
+                }
+            }
+
+            function handleCharacterSelectTap(e) {
+                const rect = canvas.getBoundingClientRect();
+                const scaleX = W / rect.width;
+                const scaleY = H / rect.height;
+                const mx = (e.clientX - rect.left) * scaleX;
+                const my = (e.clientY - rect.top) * scaleY;
+
+                const cols = 3;
+                const rows = 2;
+                const cellW = 130;
+                const cellH = 130;
+                const startX = (W - cols * cellW) / 2;
+                const startY = 130;
+                const gapX = 12;
+                const gapY = 15;
+
+                for (let i = 0; i < CHARACTER_IMAGES.length; i++) {
+                    const col = i % cols;
+                    const row = Math.floor(i / cols);
+                    const cx = startX + col * (cellW + gapX);
+                    const cy = startY + row * (cellH + gapY);
+                    if (mx >= cx && mx <= cx + cellW && my >= cy && my <= cy + cellH) {
+                        selectHero(i);
+                        gameState = 'playing';
+                        generateLevel(1);
+                        gameStartTime = Date.now();
+                        lastFrame = 0;
+                        updateScoreBar();
+                        startMusicLoop();
+                        if (animFrameId) cancelAnimationFrame(animFrameId);
+                        animFrameId = requestAnimationFrame(gameLoop);
+                        return;
+                    }
+                }
+            }
+
+            function canvasTap(e) {
+                e.preventDefault();
+                initAudio();
+                if (gameState === 'select') {
+                    handleCharacterSelectTap(e);
+                } else if (gameState === 'playing') {
+                    handleJump();
+                } else if (gameState === 'gameover') {
+                    resetGame();
+                    gameState = 'select';
+                    if (animFrameId) cancelAnimationFrame(animFrameId);
+                    animFrameId = requestAnimationFrame(standbyLoop);
+                }
+            }
+
+            function keyDown(e) {
+                if (e.code === 'Space' || e.key === ' ' || e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    initAudio();
+                    if (gameState === 'select') {
+                        if (selectedHeroIndex < 0) selectHero(0);
+                        gameState = 'playing';
+                        generateLevel(1);
+                        gameStartTime = Date.now();
+                        lastFrame = 0;
+                        updateScoreBar();
+                        startMusicLoop();
+                        if (animFrameId) cancelAnimationFrame(animFrameId);
+                        animFrameId = requestAnimationFrame(gameLoop);
+                    } else if (gameState === 'playing') {
+                        handleJump();
+                    } else if (gameState === 'gameover') {
+                        resetGame();
+                        gameState = 'select';
+                        if (animFrameId) cancelAnimationFrame(animFrameId);
+                        animFrameId = requestAnimationFrame(standbyLoop);
+                    }
+                } else if (e.key === 'm' || e.key === 'M') {
+                    toggleMute();
+                } else if (e.key === 'r' || e.key === 'R') {
+                    resetGame();
+                    gameState = 'select';
+                    if (animFrameId) cancelAnimationFrame(animFrameId);
+                    animFrameId = requestAnimationFrame(standbyLoop);
+                } else if (e.key >= '1' && e.key <= '5') {
+                    const idx = parseInt(e.key) - 1;
+                    if (idx < CHARACTER_IMAGES.length && gameState === 'select') {
+                        selectHero(idx);
+                        gameState = 'playing';
+                        generateLevel(1);
+                        gameStartTime = Date.now();
+                        lastFrame = 0;
+                        updateScoreBar();
+                        startMusicLoop();
+                        if (animFrameId) cancelAnimationFrame(animFrameId);
+                        animFrameId = requestAnimationFrame(gameLoop);
+                    }
+                }
+            }
+
+            canvas.addEventListener('click', canvasTap);
+            canvas.addEventListener('touchstart', function(e) {
+                e.preventDefault();
+                initAudio();
+                if (gameState === 'select') {
+                    const touch = e.touches[0];
+                    const rect = canvas.getBoundingClientRect();
+                    const scaleX = W / rect.width;
+                    const scaleY = H / rect.height;
+                    const mx = (touch.clientX - rect.left) * scaleX;
+                    const my = (touch.clientY - rect.top) * scaleY;
+                    const cols = 3;
+                    const rows = 2;
+                    const cellW = 130;
+                    const cellH = 130;
+                    const startX = (W - cols * cellW) / 2;
+                    const startY = 130;
+                    const gapX = 12;
+                    const gapY = 15;
+                    for (let i = 0; i < CHARACTER_IMAGES.length; i++) {
+                        const col = i % cols;
+                        const row = Math.floor(i / cols);
+                        const cx = startX + col * (cellW + gapX);
+                        const cy = startY + row * (cellH + gapY);
+                        if (mx >= cx && mx <= cx + cellW && my >= cy && my <= cy + cellH) {
+                            selectHero(i);
+                            gameState = 'playing';
+                            generateLevel(1);
+                            gameStartTime = Date.now();
+                            lastFrame = 0;
+                            updateScoreBar();
+                            startMusicLoop();
+                            if (animFrameId) cancelAnimationFrame(animFrameId);
+                            animFrameId = requestAnimationFrame(gameLoop);
+                            return;
+                        }
+                    }
+                } else if (gameState === 'playing') {
+                    handleJump();
+                } else if (gameState === 'gameover') {
+                    resetGame();
+                    gameState = 'select';
+                    if (animFrameId) cancelAnimationFrame(animFrameId);
+                    animFrameId = requestAnimationFrame(standbyLoop);
+                }
+            }, { passive: false });
+
+            canvas.addEventListener('mousemove', function(e) {
+                if (gameState !== 'select') return;
+                const rect = canvas.getBoundingClientRect();
+                const scaleX = W / rect.width;
+                const scaleY = H / rect.height;
+                const mx = (e.clientX - rect.left) * scaleX;
+                const my = (e.clientY - rect.top) * scaleY;
+                const cols = 3;
+                const rows = 2;
+                const cellW = 130;
+                const cellH = 130;
+                const startX = (W - cols * cellW) / 2;
+                const startY = 130;
+                const gapX = 12;
+                const gapY = 15;
+                charSelectHover = -1;
+                for (let i = 0; i < CHARACTER_IMAGES.length; i++) {
+                    const col = i % cols;
+                    const row = Math.floor(i / cols);
+                    const cx = startX + col * (cellW + gapX);
+                    const cy = startY + row * (cellH + gapY);
+                    if (mx >= cx && mx <= cx + cellW && my >= cy && my <= cy + cellH) {
+                        charSelectHover = i;
+                        break;
+                    }
+                }
+            });
+
+            canvas.addEventListener('mouseleave', function() {
+                charSelectHover = -1;
+            });
+
+            btnRestart.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                initAudio();
+                resetGame();
+                gameState = 'select';
+                if (animFrameId) cancelAnimationFrame(animFrameId);
+                animFrameId = requestAnimationFrame(standbyLoop);
+            });
+            btnRestart.addEventListener('touchstart', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                initAudio();
+                resetGame();
+                gameState = 'select';
+                if (animFrameId) cancelAnimationFrame(animFrameId);
+                animFrameId = requestAnimationFrame(standbyLoop);
+            }, { passive: false });
+
+            btnMute.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                initAudio();
+                toggleMute();
+            });
+            btnMute.addEventListener('touchstart', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                initAudio();
+                toggleMute();
+            }, { passive: false });
+
+            window.addEventListener('keydown', keyDown);
+
+            function standbyLoop() {
+                if (gameState === 'select') drawCharacterSelectScreen();
+                else if (gameState === 'gameover') drawGameOverScreen();
+                if (gameState !== 'playing') {
+                    animFrameId = requestAnimationFrame(standbyLoop);
+                }
+            }
+
+            function init() {
+                resetGame();
+                updateMuteBtn();
+                updateScoreBar();
+                gameState = 'select';
+                charSelectHover = -1;
+                loadCharacterImages();
+                initAudio();
+                if (animFrameId) cancelAnimationFrame(animFrameId);
+                animFrameId = requestAnimationFrame(standbyLoop);
+            }
+
+            init();
+
+            window.heroVsEnemies = {
+                start: startGame,
+                toggleMute: toggleMute,
+                getState: () => gameState,
+                getScore: () => score,
+                getLevel: () => level,
+                getSelectedHero: () => selectedHeroIndex,
+                restart: () => {
+                    resetGame();
+                    gameState = 'select';
+                    if (animFrameId) cancelAnimationFrame(animFrameId);
+                    animFrameId = requestAnimationFrame(standbyLoop);
+                },
+                selectHero: selectHero,
+            };
+
+            console.log('🎮 Hero vs Enemies – Font Awesome Edition loaded!');
+            console.log('📖 Select a character – rest become enemies.');
+            console.log('📖 Controls: SPACE/Tap = Jump | R = Restart | M = Mute | 1-5 = Quick select');
+            console.log('🎵 Background music from Google Drive.');
+            console.log('✨ Font Awesome icons rendered in HTML & Canvas.');
+        })();
+    </script>
+</body>
+</html>
