@@ -607,7 +607,7 @@
         <button id="settingsBtn" title="Settings"><i class="fa-solid fa-gear"></i></button>
         <div id="settingsOverlay"></div>
         <div id="settingsPanel">
-            <h2>⚙️ Game Settings</h2>
+            <h2>⚙Game Settings</h2>
             <h3>Hero Colors</h3>
             <div class="setting-row">
                 <label>Hero</label>
@@ -664,7 +664,7 @@
                 <span class="key">W A S D</span> / <span class="key">Arrows</span> to move<br>
                 <span class="key">Space</span> / <span class="key">Click</span> to shoot<br>
                 Survive <b>10 waves</b> to win! Collect power-ups.<br>
-                <span class="key">⚙️</span> Customize colors anytime.
+                <span class="key">⚙</span> Customize colors anytime.
             </div>
             <button class="start-btn" id="startGameBtn">▶ Start Game</button>
         </div>
@@ -1548,7 +1548,7 @@
                     this.life = 7;
                     this.animT = 0;
                     this.off = Math.random() * Math.PI * 2;
-                    const map = { health: ['+', colors.healthPU], speed: ['⚡', colors.speedPU], rapid: ['🪷',
+                    const map = { health: ['+', colors.healthPU], speed: ['⚡︎', colors.speedPU], rapid: ['🪷',
                             colors.rapidPU
                         ], damage: ['★', colors.damagePU], triple: ['∴', colors.triplePU] };
                     const m = map[type] || ['?', '#ffd700'];
